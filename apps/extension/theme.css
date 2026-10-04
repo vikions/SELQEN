@@ -182,10 +182,13 @@
   gap: 8px;
 }
 .extension-panel .price-notice svg {
-  color: var(--amber);
+  color: var(--muted);
   width: 16px;
   height: 16px;
   flex-shrink: 0;
+}
+.extension-panel .reason.price-info summary > svg:first-child {
+  color: var(--muted);
 }
 .extension-panel .price-notice h2 {
   margin: 0;

@@ -6,6 +6,7 @@ import {
   DownloadIcon,
   ChevronDownIcon,
   ArrowTopRightIcon,
+  InfoCircledIcon,
 } from "@radix-ui/react-icons";
 import { evaluate } from "../engine";
 import {
@@ -121,10 +122,13 @@ export function Review({
       {compactPriceNotice ? (
         <section className="price-notice" aria-live="polite">
           <div>
-            <ExclamationTriangleIcon />
-            <h2>Price check incomplete</h2>
+            <InfoCircledIcon />
+            <h2>Last published price</h2>
           </div>
-          <p>Latest oracle price is old. Details in the checks below.</p>
+          <p>
+            Updated {new Date(snapshot.oracle!.updatedAt).toLocaleString()}.
+            Current price not confirmed.
+          </p>
           <span>{r.scope}</span>
         </section>
       ) : (
@@ -202,12 +206,20 @@ export function Review({
           ))}
         {reasons.map((f) => (
           <details
-            className={`reason ${f.level}`}
+            className={`reason ${compactPriceNotice && f.code === "ORACLE_STALE" ? "price-info" : f.level}`}
             key={`${f.code}-${f.detail}`}
           >
             <summary>
-              <StatusIcon level={f.level} />
-              <span>{f.title}</span>
+              {compactPriceNotice && f.code === "ORACLE_STALE" ? (
+                <InfoCircledIcon />
+              ) : (
+                <StatusIcon level={f.level} />
+              )}
+              <span>
+                {compactPriceNotice && f.code === "ORACLE_STALE"
+                  ? "Price timestamp and coverage"
+                  : f.title}
+              </span>
               <ChevronDownIcon />
             </summary>
             <p>{f.detail}</p>
