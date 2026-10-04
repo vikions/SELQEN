@@ -23,6 +23,24 @@ try {
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("http://127.0.0.1:5173/");
+  await page.getByRole("heading", { name: /Know what/ }).waitFor();
+  await page.getByRole("button", { name: "Lookalike", exact: true }).click();
+  await page.getByRole("heading", { name: "Do not sign yet" }).waitFor();
+  await page.getByRole("button", { name: "Canonical", exact: true }).click();
+  await page.screenshot({ path: `${out}/landing-desktop.png`, fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page
+    .getByRole("link", { name: "Get the extension", exact: true })
+    .click();
+  await page.getByText("How to install", { exact: true }).click();
+  assert.ok(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  );
+  await page.screenshot({ path: `${out}/landing-mobile.png`, fullPage: true });
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.getByRole("link", { name: /Try the demo/ }).click();
   await page.getByRole("heading", { name: "Asset checks passed" }).waitFor();
   await page.screenshot({ path: `${out}/desktop.png`, fullPage: true });
   await page.getByRole("button", { name: /02 Same ticker/ }).click();
@@ -230,8 +248,15 @@ try {
   await dapp.bringToFront();
   await page.getByText("Wallet request observed", { exact: true }).waitFor();
   await page.getByText("Amounts from Uniswap", { exact: true }).waitFor();
-  await page.screenshot({ path: `${out}/extension-observation.png`, fullPage: true });
-  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+  await page.screenshot({
+    path: `${out}/extension-observation.png`,
+    fullPage: true,
+  });
+  assert.ok(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  );
   assert.deepEqual(errors, []);
   await dapp.locator('[data-testid="amount-input-out"]').fill("");
   await worker.evaluate(async () => {

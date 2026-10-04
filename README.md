@@ -64,7 +64,7 @@ Source failures remain visible. The extension never substitutes demonstration da
 npm run dev
 ```
 
-Open **http://127.0.0.1:5173/**. **Explore scenarios** provides six synthetic cases: canonical token, lookalike, corporate action, unfavorable quote, stale price and trading halt. **Check a live token** uses actual sources. The lab's controlled Guard dialog is a demonstration; the extension's Guard is advisory.
+Open **http://127.0.0.1:5173/** for the public landing page, or **http://127.0.0.1:5173/#lab** for the review lab. **Explore scenarios** provides six synthetic cases: canonical token, lookalike, corporate action, unfavorable quote, stale price and trading halt. **Check a live token** uses actual sources. The lab's controlled Guard dialog is a demonstration; the extension's Guard is advisory.
 
 ```sh
 npm run check
