@@ -1,0 +1,6 @@
+{
+  "private": true,
+  "name": "@selqen/robinhood",
+  "version": "0.1.0",
+  "type": "module"
+}

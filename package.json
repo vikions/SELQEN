@@ -1,0 +1,41 @@
+{
+  "name": "selqen",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "vite --config apps/demo-lab/vite.config.ts",
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "check": "npm run typecheck && npm test && npm run build",
+    "test:browser": "node scripts/browser-smoke.mjs",
+    "test:live": "node scripts/live-smoke.mjs",
+    "format": "prettier --write \"apps/**/*.{ts,tsx,css,json,html}\" \"packages/**/*.{ts,tsx,css,json}\" \"tests/**/*.ts\" \"scripts/*.mjs\""
+  },
+  "dependencies": {
+    "@fontsource/geist": "^5.2.0",
+    "@radix-ui/react-icons": "^1.3.2",
+    "decimal.js": "^10.6.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "viem": "^2.37.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.1.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "esbuild": "^0.25.0",
+    "playwright": "^1.63.0",
+    "prettier": "^3.9.8",
+    "typescript": "^5.9.0",
+    "vite": "^7.1.0",
+    "vitest": "^5.0.1"
+  }
+}

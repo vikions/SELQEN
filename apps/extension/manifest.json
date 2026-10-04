@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "SELQEN — Stock Token review",
+  "version": "0.1.0",
+  "description": "Know what you're signing. Browser safety layer for Robinhood Stock Tokens.",
+  "minimum_chrome_version": "116",
+  "permissions": ["sidePanel", "storage"],
+  "host_permissions": [
+    "https://api.robinhood.com/*",
+    "https://rpc.mainnet.chain.robinhood.com/*"
+  ],
+  "action": { "default_title": "Open SELQEN" },
+  "side_panel": { "default_path": "index.html" },
+  "background": { "service_worker": "background.js", "type": "module" },
+  "content_scripts": [
+    {
+      "matches": ["https://app.uniswap.org/*"],
+      "js": ["provider.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["https://app.uniswap.org/*"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src https://api.robinhood.com https://rpc.mainnet.chain.robinhood.com"
+  }
+}
