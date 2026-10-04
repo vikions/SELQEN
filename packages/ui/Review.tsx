@@ -53,12 +53,14 @@ export function Review({
   now,
   busy = false,
   onRefresh,
+  compactWarnings = false,
 }: {
   snapshot: Snapshot | null;
   intent?: Intent;
   now: number;
   busy?: boolean;
   onRefresh?: () => void;
+  compactWarnings?: boolean;
 }) {
   const [copy, setCopy] = useState("Copy JSON");
   if (busy)
@@ -96,6 +98,14 @@ export function Review({
     ) ??
     reasons[0];
   const outdated = now >= r.expiresAt;
+  const compactPriceNotice =
+    compactWarnings &&
+    !intent &&
+    r.verdict === "warning" &&
+    reasons.some((f) => f.code === "ORACLE_STALE") &&
+    reasons.every(
+      (f) => f.code === "ORACLE_STALE" || f.code === "SOURCE_ERROR",
+    );
   return (
     <div className="review-body">
       <div className="asset-heading">
@@ -108,30 +118,41 @@ export function Review({
         </div>
         <span className="chain-label">RH</span>
       </div>
-      <section className={`verdict ${r.verdict}`} aria-live="polite">
-        <div className="verdict-label">
-          <StatusIcon
-            level={
-              r.verdict === "verified"
-                ? "pass"
-                : r.verdict === "blocked"
-                  ? "blocked"
-                  : "warning"
-            }
-          />
-          <span>
-            {snapshot.mode === "fixture"
-              ? "SIMULATED RESULT"
-              : "CURRENT REVIEW"}
-          </span>
-        </div>
-        <h2>{r.title}</h2>
-        <p>
-          {primary?.detail ??
-            "Canonical identity, valuation sources and reported trading state passed the configured checks."}
-        </p>
-        <div className="coverage">{r.scope}</div>
-      </section>
+      {compactPriceNotice ? (
+        <section className="price-notice" aria-live="polite">
+          <div>
+            <ExclamationTriangleIcon />
+            <h2>Price check incomplete</h2>
+          </div>
+          <p>Latest oracle price is old. Details in the checks below.</p>
+          <span>{r.scope}</span>
+        </section>
+      ) : (
+        <section className={`verdict ${r.verdict}`} aria-live="polite">
+          <div className="verdict-label">
+            <StatusIcon
+              level={
+                r.verdict === "verified"
+                  ? "pass"
+                  : r.verdict === "blocked"
+                    ? "blocked"
+                    : "warning"
+              }
+            />
+            <span>
+              {snapshot.mode === "fixture"
+                ? "SIMULATED RESULT"
+                : "CURRENT REVIEW"}
+            </span>
+          </div>
+          <h2>{r.title}</h2>
+          <p>
+            {primary?.detail ??
+              "Canonical identity, valuation sources and reported trading state passed the configured checks."}
+          </p>
+          <div className="coverage">{r.scope}</div>
+        </section>
+      )}
       {intent && (
         <section className="settlement">
           <div className="section-title">

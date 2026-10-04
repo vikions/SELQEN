@@ -219,6 +219,7 @@ function App() {
         </section>
       ) : (
         <Review
+          compactWarnings
           snapshot={snapshot}
           intent={intent}
           now={now}
