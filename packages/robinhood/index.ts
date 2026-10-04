@@ -1,4 +1,4 @@
-import { z } from "zod";
+﻿import { z } from "zod";
 import Decimal from "decimal.js";
 import {
   createPublicClient,
@@ -224,7 +224,7 @@ export async function checkAsset(
       );
     if (t.oracle.failed)
       snapshot.errors.push(
-        "Verified AAPL Chainlink feed could not be read or validated.",
+        "Verified Chainlink equity feed could not be read or validated.",
       );
     const effective = Number(t.effective) * 1000;
     if (effective > at && t.pending !== t.multiplier) {

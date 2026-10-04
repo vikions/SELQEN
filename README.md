@@ -1,109 +1,208 @@
-﻿# SELQEN
+# SELQEN
 
-**Know what you're signing.**  
-Browser safety layer for Robinhood Stock Tokens.
+**Know what you're signing.**
 
-SELQEN is a Chrome extension MVP for **Robinhood Chain mainnet (4663)**. Open its side panel beside Uniswap to review canonical token identity, corporate-action multipliers, trading state and price references. It reads official sources and explains missing or conflicting evidence before you make a decision in your wallet.
+SELQEN is a browser safety layer for **Robinhood Stock Tokens** on **Robinhood Chain**.
 
-The extension uses real mainnet data. A separate development lab provides clearly labelled synthetic scenarios for demonstrations and regression testing.
+It runs as a Chrome extension beside the dApps users already use and turns fragmented asset, pricing, corporate-action and trade-context data into a simple review before the user signs.
 
-## What the MVP does
+**Live app:** https://selqen.vercel.app  
+**Source:** https://github.com/vikions/SELQEN
 
-- **Canonical identity:** resolves chain and contract address through the Robinhood registry instead of trusting a ticker or logo.
-- **Corporate-action checks:** reconciles issuer and onchain multipliers, reads pending changes and checks trading halt and oracle pause state.
-- **Independent references:** reads address-pinned Chainlink AAPL/USD and USDG/USD feeds, validates answers and timestamps, and compares the adjusted equity reference with issuer prices.
-- **USDG quote review:** calculates an indicative settlement reference. Missing USDG oracle data produces an explicit parity-assumption warning; an expired supplied reference blocks comparison.
-- **Uniswap amount observation:** displays visible input/output amounts and allows import after confirmation of unscaled token units. Changes invalidate comparison inputs.
-- **MetaMask request observation:** displays request network, contract and recognized ERC-20-shaped approval/transfer fields, including unlimited approvals. Unknown payloads remain unverified.
-- **Evidence export:** saves unsigned JSON receipts containing asset/quote evidence, policy, timestamps and review scope.
+---
 
-**Observe** presents the review in the panel. **Guard** adds an advisory warning on supported pages when an asset/quote check is blocked. Both modes leave wallet decisions with you.
+## Why SELQEN
+
+A ticker and a swap quote are not enough to safely understand a tokenized stock.
+
+A Stock Token can look familiar while pointing to the wrong contract. Corporate actions can change multipliers. Price sources can become stale or disagree. Trading state can change. A user may be looking at a quote without seeing the evidence behind it.
+
+SELQEN brings those checks into one compact browser-side review.
+
+The goal is simple:
+
+> **Stay in your dApp. Check the asset. Understand the context. Then decide what to sign.**
+
+---
+
+## What SELQEN checks
+
+### Canonical asset identity
+SELQEN resolves Stock Tokens by **chain and contract address** against official Robinhood sources instead of trusting a ticker, logo or token name.
+
+### Corporate-action state
+It reviews current and pending multiplier data, corporate-action context, trading state and relevant pause conditions.
+
+### Independent price references
+SELQEN uses address-pinned Chainlink equity / ETF feeds and USDG/USD references, validates timestamps and compares normalized values with issuer-side data.
+
+The current build includes **32 configured equity / ETF feed mappings**, including assets such as AAPL, NVDA, TSLA, MSFT and AMZN.
+
+### USDG quote review
+For Stock Token → USDG flows, SELQEN calculates an independent indicative settlement reference and highlights material differences that deserve review.
+
+### Uniswap context
+The extension can observe supported Uniswap page context and visible trade amounts so the review stays beside the transaction the user is already preparing.
+
+### Wallet request context
+SELQEN can passively summarize supported MetaMask request shapes, including common ERC-20 approvals and transfers, without taking custody or signing anything.
+
+### Evidence receipts
+Reviews can be exported as compact JSON receipts containing the asset, network, sources, timestamps, checks and verdict context.
+
+---
+
+## Observe and Guard
+
+SELQEN has two user modes:
+
+- **Observe** — shows the review and evidence beside the dApp.
+- **Guard** — adds a stronger advisory warning when a supported check finds a blocking or high-risk condition.
+
+SELQEN does **not** hold funds, request seed phrases, store private keys or sign transactions.
+
+The user always remains in control.
+
+---
+
+## Demo experience
+
+The hackathon MVP is a real **Chrome Manifest V3 extension** loaded locally in Developer Mode.
+
+A typical demo flow:
+
+1. Open SELQEN beside a supported Robinhood Chain dApp.
+2. Review a canonical Robinhood Stock Token.
+3. Compare it with a non-canonical lookalike token.
+4. Inspect multiplier / corporate-action state.
+5. Review an indicative Stock Token → USDG valuation.
+6. See a clear verdict and source evidence directly in the browser side panel.
+
+SELQEN also includes a clearly labelled demo lab for deterministic scenarios such as:
+
+- canonical token
+- lookalike / non-canonical token
+- pending corporate action
+- stale price
+- trading halt
+- unfavorable quote
+
+Synthetic scenarios are always separated from live-source checks.
+
+---
 
 ## Install from source
 
-Requirements: **Node.js 22.17+**, npm and **Chrome 116+**.
+Requirements:
 
-```sh
+- Node.js 22.17+
+- npm
+- Chrome 116+
+
+```bash
 git clone https://github.com/vikions/SELQEN.git
 cd SELQEN
 npm ci
 npm run build
 ```
 
-1. Open `chrome://extensions` and enable **Developer mode**.
-2. Choose **Load unpacked** and select `dist/extension`.
-3. Pin SELQEN and click its icon to open the side panel.
-4. Paste a Stock Token contract address, or open the [AAPL/USDG Uniswap page](https://app.uniswap.org/swap?chain=robinhood&inputCurrency=0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9&outputCurrency=0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168).
-5. Inspect the verdict and expand **Source evidence** for addresses and timestamps.
+Then:
 
-After rebuilding, reload the extension and the Uniswap tab. A wallet connection is not required for the standalone asset checker. SELQEN does not require a seed phrase, API key or backend account.
+1. Open `chrome://extensions`
+2. Enable **Developer mode**
+3. Click **Load unpacked**
+4. Select `dist/extension`
+5. Pin SELQEN and open the side panel
 
-AAPL example: `0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9`. Each check resolves identity from the registry again; this example is not a substitute for live verification.
+You can then paste a Robinhood Stock Token contract address into the checker or use SELQEN beside a supported dApp flow.
 
-## Coverage
+No backend account, API key or wallet secret is required.
 
-| Surface | MVP support |
-| --- | --- |
-| Network | Robinhood Chain mainnet, chain ID 4663 |
-| Identity and issuer data | Official registry and supported token-contract interfaces |
-| Independent equity oracle | AAPL/USD; other equity mappings are not yet implemented |
-| Settlement reference | USDG/USD on Robinhood Chain |
-| dApp integration | Uniswap URL context and visible amounts |
-| Wallet integration | Passive MetaMask provider request observation |
-| Distribution | Unpacked Chrome extension built from source |
-
-SELQEN currently reviews **assets and indicative quotes**, with a separate, untrusted page-level request summary. It does not simulate execution, verify resulting signatures, fully decode Uniswap routers or Permit2, or bind every wallet request to the reviewed quote. Page observations can be spoofed or suppressed. A successful asset check is not approval of a transaction.
-
-Importing page amounts requires confirmation of unscaled token units; automatic proof of scaling is not implemented. Morpho, additional equity feed mappings and smart-contract settlement are outside this release. There is no project-owned onchain deployment.
-
-Source failures remain visible. The extension never substitutes demonstration data for an unavailable live response. Stale prices can prevent a review outside market hours.
-
-## Development and validation
-
-```sh
-npm run dev
-```
-
-Open **http://127.0.0.1:5173/** for the public landing page, or **http://127.0.0.1:5173/#lab** for the review lab. **Explore scenarios** provides six synthetic cases: canonical token, lookalike, corporate action, unfavorable quote, stale price and trading halt. **Check a live token** uses actual sources. The lab's controlled Guard dialog is a demonstration; the extension's Guard is advisory.
-
-```sh
-npm run check
-```
-
-This runs TypeScript validation, unit/integration tests and both production builds. On **October 4, 2026**, all **41 tests**, typecheck and build passed. The September 28 browser run also verified the unpacked extension with controlled page/provider fixtures; it was not a real MetaMask trade.
-
-For browser acceptance, build first, start `npm run dev` in another terminal, then run:
-
-```sh
-npx playwright install chromium
-npm run test:browser
-```
-
-Tests use a disposable profile. Screenshots are written to `output/playwright`. Set `BROWSER_EXECUTABLE_PATH` if using an existing Chromium installation.
-
-Read-only live checks are separate and depend on external source availability:
-
-```sh
-node scripts/extension-live-smoke.mjs
-node scripts/oracle-smoke.mjs
-```
-
-The extension live-check script currently defaults to a local Windows Chromium path; set `BROWSER_EXECUTABLE_PATH` to your installed browser when needed. September 28 extension-worker checks successfully read AAPL identity, quotes, token state, corporate actions and both oracle feeds. Current user-driven mainnet and MetaMask acceptance checks remain pending.
-
-The optional `npm run test:live` uses Node directly. During September testing, Node API requests returned HTTP 403 while browser/extension requests succeeded. The development lab's Node proxy may encounter the same restriction. The static lab can also be subject to browser CORS rules. The packaged extension reads sources through its worker with explicit host permissions.
+---
 
 ## Architecture
 
-| Directory | Responsibility |
+SELQEN is structured as a small TypeScript monorepo:
+
+| Path | Responsibility |
 | --- | --- |
-| `apps/extension` | MV3 worker, page/provider observers and side panel |
-| `apps/demo-lab` | Development workbench and labelled scenarios |
-| `packages/engine` | Deterministic review rules and decimal arithmetic |
-| `packages/robinhood` | Official source validation and contract/feed reads |
-| `packages/adapters` | Uniswap context, amounts and wallet request summaries |
-| `packages/sdk` | Evidence receipts and isolated fixtures |
-| `packages/ui` | Shared review components and styles |
+| `apps/extension` | Chrome MV3 worker, page observers and side panel |
+| `apps/demo-lab` | Public landing experience and labelled demo scenarios |
+| `packages/engine` | Deterministic review logic and valuation rules |
+| `packages/robinhood` | Robinhood source validation and onchain reads |
+| `packages/adapters` | dApp and wallet-context adapters |
+| `packages/sdk` | Review orchestration and evidence receipts |
+| `packages/ui` | Shared interface components |
+| `tests` | Unit and integration coverage |
 
-See [coverage and trust boundaries](docs/coverage.md), [product scope](PRODUCT.md) and the [demo walkthrough](docs/demo-script.md). Historical source research is preserved in the [September 18 research report](docs/research-2026-09-18.md).
+Core stack:
 
-SELQEN is an independent project and is not affiliated with Robinhood, Uniswap, MetaMask or Chainlink.
+**TypeScript · React · Vite · Chrome MV3 · viem · Decimal.js · Zod · Vitest · Playwright**
+
+---
+
+## Validation
+
+The release is built around explicit evidence rather than silent fallbacks.
+
+```bash
+npm run check
+```
+
+This runs:
+
+- TypeScript validation
+- unit / integration tests
+- production builds
+
+The project also includes browser and live-source smoke checks for the unpacked extension.
+
+Live-source failures stay visible to the user instead of being replaced with synthetic data.
+
+---
+
+## Product principles
+
+SELQEN is designed around four rules:
+
+1. **Contract identity beats ticker identity.**
+2. **Corporate actions are part of valuation, not an edge case.**
+3. **Missing evidence must stay missing — never silently become “safe”.**
+4. **Security context belongs beside the trade, not in a separate dashboard.**
+
+---
+
+## Built for Robinhood Chain
+
+SELQEN is purpose-built around the Stock Token model on **Robinhood Chain mainnet (chain ID 4663)**.
+
+Robinhood Stock Token identity, issuer data, multiplier state, trading context and USDG settlement references are core product inputs — not a generic chain label added to an existing wallet-security product.
+
+---
+
+## Status
+
+SELQEN is a working hackathon MVP with:
+
+- a live public landing page
+- a real unpacked Chrome extension
+- Robinhood Chain mainnet data
+- canonical Stock Token checks
+- multi-asset equity / ETF reference coverage
+- corporate-action and multiplier review
+- USDG settlement references
+- Uniswap context support
+- MetaMask request observation
+- exportable evidence receipts
+- deterministic demo scenarios
+- automated test coverage
+
+The current focus is expanding supported transaction context and dApp coverage while keeping the extension lightweight and transparent.
+
+---
+
+## Disclaimer
+
+SELQEN is an independent project and is not affiliated with Robinhood, Uniswap, MetaMask, Chainlink or Paxos.
+
+SELQEN provides informational safety context. It does not provide investment advice, custody assets or guarantee transaction outcomes.

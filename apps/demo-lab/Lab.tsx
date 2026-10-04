@@ -287,8 +287,9 @@ export default function Lab() {
                 <h3>Sources, in plain sight</h3>
                 <p>
                   Robinhood asset registry, underlying bid/ask, corporate
-                  actions and token-contract multiplier. AAPL/USD and USDG/USD
-                  Chainlink references are connected.
+                  actions and token-contract multiplier. 32 equity/ETF Chainlink
+                  references and USDG/USD are connected; coverage varies by
+                  token.
                 </p>
                 <a
                   href={`https://app.uniswap.org/swap?chain=robinhood&inputCurrency=${AAPL}&outputCurrency=${USDG}`}

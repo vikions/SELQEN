@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Brand, Review, AddressForm } from "../../packages/ui/Review";
 import "../../packages/ui/styles.css";
+import "./theme.css";
 import { evaluate } from "../../packages/engine";
 import {
   policyAt,
@@ -130,7 +131,7 @@ function App() {
     };
   }, [guard, blocked, busy, tabId]);
   return (
-    <main className="panel">
+    <main className="panel extension-panel">
       <header className="panel-header">
         <Brand />
         <p className="tagline">Know what you're signing.</p>
@@ -155,25 +156,57 @@ function App() {
       </div>
       {guard && (
         <div className="guard-note">
-          Advisory guard shows warnings on supported pages. Your wallet remains
-          in control.
+          Guard adds page warnings. Your wallet stays in control.
         </div>
       )}
       <div className="context-bar">
         <strong>
-          {context ? "Uniswap context detected" : "Generic token checker"}
+          {context
+            ? context.chainId === 4663 && context.tokenAddress
+              ? "Uniswap · Robinhood Chain"
+              : "Choose a Robinhood stock token"
+            : "Generic token checker"}
         </strong>
         <p>
           {context
-            ? "Token addresses come from the URL. Visible amounts and MetaMask requests are observed separately; neither proves the final trade."
-            : "Paste an address to review official asset data."}
+            ? context.chainId === 4663 && context.tokenAddress
+              ? "Reviewing the token from this page’s URL."
+              : "This URL does not identify a supported stock token. Paste its Robinhood Chain contract address below."
+            : "Review any stock-token address against the official Robinhood registry."}
         </p>
-        {context && !context.tokenAddress && (
-          <p>
-            No complete token address found in this URL. Use the manual checker.
-          </p>
-        )}
       </div>
+      {error && (
+        <div className="error-banner" role="alert">
+          {error}
+        </div>
+      )}
+      {!snapshot && !busy ? (
+        <section className="extension-start">
+          <span className="start-label">A clearer first step</span>
+          <h1>
+            Check the token.
+            <br />
+            <span>Then decide.</span>
+          </h1>
+          <p>Identity, price and corporate actions — in one review.</p>
+          <AddressForm busy={busy} onCheck={(a) => void run(a)} />
+          <span className="start-footnote">
+            Read-only check · No wallet connection needed
+          </span>
+        </section>
+      ) : (
+        <Review
+          snapshot={snapshot}
+          intent={intent}
+          now={now}
+          busy={busy}
+          onRefresh={
+            snapshot
+              ? () => void run(lastAddress.current, snapshot.chainId)
+              : undefined
+          }
+        />
+      )}
       {context?.pageAmounts && (
         <section className="context-bar" aria-label="Observed page amounts">
           <strong>Amounts from Uniswap</strong>
@@ -208,7 +241,7 @@ function App() {
             )}
         </section>
       )}
-      {context && (
+      {context && wallet && (
         <section
           className="context-bar"
           aria-label="Wallet request observation"
@@ -280,23 +313,12 @@ function App() {
           )}
         </section>
       )}
-      {error && (
-        <div className="error-banner" role="alert">
-          {error}
-        </div>
+      {snapshot && (
+        <details className="live-form">
+          <summary>Check another token</summary>
+          <AddressForm busy={busy} onCheck={(a) => void run(a)} />
+        </details>
       )}
-      <Review
-        snapshot={snapshot}
-        intent={intent}
-        now={now}
-        busy={busy}
-        onRefresh={
-          snapshot
-            ? () => void run(lastAddress.current, snapshot.chainId)
-            : undefined
-        }
-      />
-      <AddressForm busy={busy} onCheck={(a) => void run(a)} />
       {snapshot?.canonical && (
         <details className="live-form" ref={manualForm}>
           <summary>Compare a USDG quote manually</summary>

@@ -1,8 +1,9 @@
 import { formatUnits, parseAbi, type PublicClient } from "viem";
-import { AAPL, MAINNET, sameAddress, type Snapshot } from "../engine/types";
+import { MAINNET, sameAddress, type Snapshot } from "../engine/types";
+import catalog from "./feeds.json";
 
-// Official Chainlink directory, checked 2026-09-28. Address matching is
-// deliberately explicit: a token symbol alone never selects a price feed.
+// Official directory joined to the official registry; provenance in feeds.json.
+// A token symbol alone never selects a price feed at runtime.
 // https://reference-data-directory.vercel.app/feeds-robinhood-mainnet.json
 export const AAPL_FEED = "0x6B22A786bAa607d76728168703a39Ea9C99f2cD0" as const;
 export const USDG_FEED = "0x61B7e5650328764B076A108EFF5fa7282a1B9aD2" as const;
@@ -16,7 +17,7 @@ export function normalizeRound(
   round: readonly [bigint, bigint, bigint, bigint, bigint],
   decimals: number,
   now = Date.now(),
-): NonNullable<Snapshot["oracle"]> {
+): Omit<NonNullable<Snapshot["oracle"]>, "address"> {
   const [id, answer, started, updated, answered] = round;
   const updatedAt = Number(updated) * 1000;
   if (
@@ -35,7 +36,6 @@ export function normalizeRound(
     value: formatUnits(answer, decimals),
     updatedAt,
     maxAgeMs: 86_400_000,
-    address: AAPL_FEED,
   };
 }
 
@@ -45,8 +45,19 @@ export async function readEquityOracle(
   chainId: number,
   blockNumber: bigint,
 ) {
-  if (chainId !== MAINNET || !sameAddress(address, AAPL)) return undefined;
-  return readFeed(client, AAPL_FEED, "Robinhood AAPL / USD", blockNumber);
+  const feed = catalog.feeds.find(
+    (entry) =>
+      chainId === MAINNET &&
+      entry.chainId === chainId &&
+      sameAddress(address, entry.tokenAddress),
+  );
+  if (!feed) return undefined;
+  return readFeed(
+    client,
+    feed.feedAddress as `0x${string}`,
+    feed.description,
+    blockNumber,
+  );
 }
 export async function readSettlementOracle(
   client: PublicClient,

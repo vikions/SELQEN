@@ -1,0 +1,230 @@
+/* Compact stock-token review: graphite, bright green actions, separate risk hues.
+ The first screen offers a read-only check; observation details follow the verdict. */
+:root {
+  color-scheme: dark;
+  --ink: #f0f3e9;
+  --muted: #abb5a2;
+  --line: #30392b;
+  --green: #c2f970;
+  --paper: #111610;
+  --amber: #f5c779;
+  --red: #ffb3a6;
+  background: var(--paper);
+  color: var(--ink);
+}
+.extension-panel {
+  min-height: 100dvh;
+  font-family: Geist, Arial, sans-serif;
+}
+.extension-panel .panel-header {
+  padding: 24px 22px 18px;
+}
+.extension-panel .brand {
+  font-size: 25px;
+  letter-spacing: -0.035em;
+}
+.extension-panel .brand svg {
+  width: 32px;
+  height: 32px;
+  color: var(--green);
+}
+.extension-panel .brand-dot {
+  color: var(--green);
+}
+.extension-panel .tagline {
+  margin-top: 9px;
+  font-size: 12px;
+}
+.extension-panel .mode-switch {
+  background: #20281b;
+  border: 1px solid var(--line);
+  margin-top: 22px;
+  padding: 4px;
+}
+.extension-panel button {
+  background: var(--green);
+  color: #17210e;
+  min-height: 44px;
+  font-weight: 600;
+}
+.extension-panel button:hover {
+  background: #d4ff97;
+}
+.extension-panel .mode-switch button {
+  background: transparent;
+  color: var(--muted);
+  min-height: 36px;
+}
+.extension-panel .mode-switch button[aria-pressed="true"] {
+  background: var(--green);
+  color: #17210e;
+  box-shadow: none;
+}
+.extension-panel .source-strip {
+  background: #192215;
+  color: #c2d4b1;
+  padding: 11px 22px;
+  font-size: 10px;
+}
+.extension-panel .guard-note {
+  background: #1b2814;
+  color: #cfdfbe;
+  padding: 10px 22px;
+}
+.extension-panel .context-bar {
+  padding: 16px 22px;
+}
+.extension-panel .context-bar strong {
+  font-size: 12px;
+  font-weight: 500;
+}
+.extension-panel .context-bar p {
+  font-size: 12px;
+  line-height: 1.6;
+}
+.extension-start {
+  padding: 28px 22px 25px;
+}
+.start-label {
+  font-size: 11px;
+  color: var(--muted);
+}
+.extension-start h1 {
+  font-size: 36px;
+  line-height: 1.08;
+  font-weight: 500;
+  margin: 18px 0;
+  letter-spacing: -0.035em;
+}
+.extension-start h1 span {
+  color: var(--green);
+}
+.extension-start p {
+  font-size: 13px;
+  max-width: 28ch;
+  color: var(--muted);
+  margin-bottom: 22px;
+}
+.extension-start button {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  font-size: 14px;
+}
+.start-footnote {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 12px;
+}
+.extension-panel .address-form {
+  padding: 20px 22px;
+}
+.extension-panel .extension-start .address-form {
+  padding: 0;
+  border: 0;
+}
+.extension-start .input-action {
+  display: flex;
+  flex-direction: column;
+}
+.extension-start .input-action input {
+  width: 100%;
+  min-height: 46px;
+}
+.extension-panel input,
+.extension-panel select {
+  background: #1b2317;
+  border-color: #536344;
+  color: var(--ink);
+  font-size: 12px;
+}
+.extension-panel input::placeholder {
+  color: #a5b29a;
+}
+.extension-panel .asset-monogram {
+  background: #26351b;
+  color: var(--green);
+  border: 0;
+}
+.extension-panel .review-body {
+  padding: 22px;
+}
+.extension-panel .verdict {
+  background: #263b1a;
+  color: #d0f3ad;
+}
+.extension-panel .verdict.warning {
+  background: #352b17;
+  color: #f8d599;
+}
+.extension-panel .verdict.blocked {
+  background: #38231f;
+  color: #ffc2b4;
+}
+.extension-panel .verdict h2 {
+  font-size: 30px;
+  font-weight: 500;
+}
+.extension-panel .verdict p {
+  font-size: 12px;
+}
+.extension-panel .secondary {
+  background: #26321e;
+  color: #d4e5c3;
+}
+.extension-panel .secondary:hover {
+  background: #354628;
+}
+.extension-panel .text-button {
+  background: transparent;
+  color: var(--green);
+}
+.extension-panel .text-button:hover {
+  background: transparent;
+}
+.extension-panel .error-banner {
+  background: #38231f;
+  color: var(--red);
+}
+.extension-panel .skeleton {
+  background: #273021;
+}
+.extension-panel .live-form {
+  padding: 16px 22px;
+}
+.extension-panel .live-form .address-form {
+  padding: 12px 0 0;
+  border: 0;
+}
+.extension-panel .live-form summary {
+  margin-bottom: 0;
+  min-height: 28px;
+}
+.extension-panel .live-form[open] > summary {
+  margin-bottom: 16px;
+}
+.extension-panel .panel-note {
+  padding: 16px 22px;
+  font-size: 10px;
+}
+.extension-panel :is(button, a, input, summary):focus-visible {
+  outline: 2px solid #c2f970;
+  outline-offset: 3px;
+}
+@media (max-width: 340px) {
+  .extension-start h1 {
+    font-size: 32px;
+  }
+  .extension-panel .input-action {
+    flex-wrap: wrap;
+  }
+  .extension-panel .input-action input {
+    flex-basis: 100%;
+  }
+  .extension-panel .input-action button {
+    width: 100%;
+  }
+}

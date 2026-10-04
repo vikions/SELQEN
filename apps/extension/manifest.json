@@ -4,12 +4,24 @@
   "version": "0.1.0",
   "description": "Know what you're signing. Browser safety layer for Robinhood Stock Tokens.",
   "minimum_chrome_version": "116",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
   "permissions": ["sidePanel", "storage"],
   "host_permissions": [
     "https://api.robinhood.com/*",
     "https://rpc.mainnet.chain.robinhood.com/*"
   ],
-  "action": { "default_title": "Open SELQEN" },
+  "action": {
+    "default_title": "Open SELQEN",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
   "side_panel": { "default_path": "index.html" },
   "background": { "service_worker": "background.js", "type": "module" },
   "content_scripts": [

@@ -14,6 +14,10 @@ const executablePath =
     ? chromium.executablePath()
     : fallback);
 const out = "output/playwright";
+const siteUrl = process.env.SELQEN_BASE_URL ?? "http://127.0.0.1:5173/";
+if (!["http:", "https:"].includes(new URL(siteUrl).protocol)) {
+  throw new Error("SELQEN_BASE_URL must be an HTTP(S) site URL.");
+}
 await mkdir(out, { recursive: true });
 const browser = await chromium.launch({ executablePath, headless: true });
 try {
@@ -22,7 +26,8 @@ try {
   });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.goto("http://127.0.0.1:5173/");
+  console.log(`Checking website: ${siteUrl}`);
+  await page.goto(siteUrl);
   await page.getByRole("heading", { name: /Know what/ }).waitFor();
   await page.getByRole("button", { name: "Lookalike", exact: true }).click();
   await page.getByRole("heading", { name: "Do not sign yet" }).waitFor();

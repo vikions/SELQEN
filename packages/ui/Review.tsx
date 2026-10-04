@@ -18,12 +18,10 @@ import { exportReceipt, receipt } from "../sdk";
 export function Brand() {
   return (
     <div className="brand">
-      <svg viewBox="0 0 28 28" aria-hidden="true">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
         <path
-          d="M11 3H3v8M17 3h8v8M25 17v8h-8M11 25H3v-8M9 14l3 3 7-7"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
+          d="M25 5H11L5 11v5h14l-4-4h-5l3-3h8ZM7 27h14l6-6v-5H13l4 4h5l-3 3h-8Z"
+          fill="currentColor"
         />
       </svg>
       <span>
