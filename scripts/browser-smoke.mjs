@@ -160,6 +160,9 @@ try {
   await context.route("https://app.uniswap.org/**", (route) =>
     route.fulfill({
       contentType: "text/html",
+      headers: {
+        "Content-Security-Policy": "script-src 'self'; object-src 'none'",
+      },
       body: "<!doctype html><title>SELQEN adapter test fixture</title><h1>Controlled Uniswap URL fixture</h1>",
     }),
   );
@@ -296,6 +299,71 @@ try {
   await dapp.waitForSelector("#selqen-advisory", { state: "attached" });
   console.log(
     "PASS: isolated content script and URL context messaging on a synthetic Uniswap-origin page.",
+  );
+  await dapp.evaluate(() => {
+    history.replaceState(null, "", "/swap?chain=mainnet&inputCurrency=NATIVE");
+    const button = document.createElement("div");
+    button.dataset.testid = "choose-output-token";
+    button.innerHTML =
+      '<span data-testid="choose-output-token-label">AAPL</span><span data-testid="network-logo-4663"></span>';
+    button.__reactFiber$fixture = {
+      memoizedProps: {},
+      return: {
+        memoizedProps: {
+          selectedCurrencyInfo: {
+            currency: {
+              address: "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+              chainId: 4663,
+              symbol: "AAPL",
+            },
+          },
+        },
+      },
+    };
+    document.body.append(button);
+  });
+  await worker.evaluate(async () => {
+    for (let i = 0; i < 50; i++) {
+      if (
+        Object.values(await chrome.storage.session.get(null)).some(
+          (c) =>
+            c.coverage === "page-state" &&
+            c.outputAddress?.toLowerCase() ===
+              "0xaf3d76f1834a1d425780943c99ea8a608f8a93f9" &&
+            c.chainId === 4663,
+        )
+      )
+        return;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    throw new Error(
+      "Selected buy token did not replace stale URL context under CSP",
+    );
+  });
+  await dapp.evaluate(() => {
+    const button = document.querySelector(
+      '[data-testid="choose-output-token"]',
+    );
+    button.__reactFiber$fixture.return.memoizedProps.selectedCurrencyInfo.currency.address =
+      "not-an-address";
+  });
+  await worker.evaluate(async () => {
+    for (let i = 0; i < 50; i++) {
+      if (
+        Object.values(await chrome.storage.session.get(null)).some(
+          (c) =>
+            c.coverage === "page-state" &&
+            c.outputAddress === null &&
+            c.tokenAddress === null,
+        )
+      )
+        return;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    throw new Error("Invalid selection retained old token identity");
+  });
+  console.log(
+    "PASS: selected buy-token bridge under CSP, stale URL override, invalid selection clears previous identity (controlled React props).",
   );
   console.log(
     "PASS: unpacked MV3 service worker, side-panel page, persistent mode, message validation, 380px layout.",

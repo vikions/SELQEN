@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { selectionSchema, type Selection } from "./selection";
 export const contextSchema = z.object({
   site: z.literal("Uniswap"),
   url: z.string().url(),
@@ -12,7 +13,8 @@ export const contextSchema = z.object({
     .regex(/^0x[0-9a-fA-F]{40}$/)
     .nullable(),
   observedAt: z.number(),
-  coverage: z.literal("url-only"),
+  coverage: z.enum(["url-only", "page-state"]),
+  selection: selectionSchema.optional(),
   pageAmounts: z
     .object({
       input: z.string().regex(/^(?:\d{1,40})(?:\.\d{1,36})?$/),
@@ -24,6 +26,36 @@ export const contextSchema = z.object({
     .optional(),
 });
 export type PageContext = z.infer<typeof contextSchema>;
+export function withSelection(
+  context: PageContext,
+  selection: Selection,
+): PageContext {
+  return {
+    ...context,
+    coverage: "page-state",
+    selection,
+    chainId: selection.input?.chainId ?? selection.output?.chainId ?? null,
+    tokenAddress: selection.input?.address ?? null,
+    outputAddress: selection.output?.address ?? null,
+  };
+}
+export function reviewTarget(
+  context: PageContext | null,
+): { address: string; chainId: number } | null {
+  if (!context) return null;
+  const settlement = "0x5fc5360d0400a0fd4f2af552add042d716f1d168";
+  const address =
+    context.tokenAddress && context.tokenAddress.toLowerCase() !== settlement
+      ? context.tokenAddress
+      : context.outputAddress;
+  const chainId =
+    address === context.outputAddress && context.coverage === "page-state"
+      ? context.selection?.output?.chainId
+      : context.chainId;
+  return address && address.toLowerCase() !== settlement && chainId != null
+    ? { address, chainId }
+    : null;
+}
 // Selectors inspected on app.uniswap.org on 2026-09-28. Labels are display
 // evidence only; they never establish address identity or amount scaling.
 export function readUniswapAmounts(

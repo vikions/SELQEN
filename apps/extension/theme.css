@@ -17,7 +17,7 @@
   font-family: Geist, Arial, sans-serif;
 }
 .extension-panel .panel-header {
-  padding: 24px 22px 18px;
+  padding: 18px 22px 14px;
 }
 .extension-panel .brand {
   font-size: 25px;
@@ -38,7 +38,7 @@
 .extension-panel .mode-switch {
   background: #20281b;
   border: 1px solid var(--line);
-  margin-top: 22px;
+  margin-top: 14px;
   padding: 4px;
 }
 .extension-panel button {
@@ -60,6 +60,14 @@
   color: #17210e;
   box-shadow: none;
 }
+.extension-panel .mode-switch button[aria-pressed="false"]:hover {
+  background: #303e25;
+  color: var(--ink);
+}
+.extension-panel .mode-switch button[aria-pressed="true"]:hover {
+  background: #d4ff97;
+  color: #17210e;
+}
 .extension-panel .source-strip {
   background: #192215;
   color: #c2d4b1;
@@ -72,7 +80,7 @@
   padding: 10px 22px;
 }
 .extension-panel .context-bar {
-  padding: 16px 22px;
+  padding: 12px 22px;
 }
 .extension-panel .context-bar strong {
   font-size: 12px;
@@ -104,6 +112,9 @@
   max-width: 28ch;
   color: var(--muted);
   margin-bottom: 22px;
+}
+.extension-panel .extension-start .field-error {
+  color: var(--red);
 }
 .extension-start button {
   width: 100%;
@@ -165,8 +176,24 @@
   color: #ffc2b4;
 }
 .extension-panel .verdict h2 {
-  font-size: 30px;
+  font-size: 26px;
   font-weight: 500;
+}
+.extension-panel .check-pass {
+  color: #d0f3ad;
+}
+.extension-panel .check-pass svg {
+  color: #c2f970;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.extension-panel .check-status {
+  color: #d0f3ad;
+}
+.extension-panel .verdict {
+  padding: 16px;
+  margin-bottom: 18px;
 }
 .extension-panel .verdict p {
   font-size: 12px;

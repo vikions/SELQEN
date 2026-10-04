@@ -1,5 +1,29 @@
-import { uniswapContext, readUniswapAmounts } from "../../packages/adapters";
+import {
+  uniswapContext,
+  readUniswapAmounts,
+  withSelection,
+} from "../../packages/adapters";
+import {
+  selectionSchema,
+  type Selection,
+} from "../../packages/adapters/selection";
 import { walletObservationSchema } from "../../packages/adapters/wallet";
+let selection: Selection | null = null;
+let selectionAt = 0;
+window.addEventListener("message", (event) => {
+  if (
+    event.source !== window ||
+    event.origin !== location.origin ||
+    event.data?.channel !== "selqen-selection-v1"
+  )
+    return;
+  const parsed = selectionSchema.nullable().safeParse(event.data.selection);
+  if (parsed.success) {
+    selection = parsed.data;
+    selectionAt = Date.now();
+    observe();
+  }
+});
 window.addEventListener("message", (event) => {
   if (
     event.source !== window ||
@@ -18,19 +42,35 @@ window.addEventListener("message", (event) => {
 });
 let previous = "";
 let previousAmounts = "";
+let previousSelection = "";
+let lastSent = 0;
+let heldAmounts: ReturnType<typeof readUniswapAmounts>;
 function observe() {
+  const currentSelection = Date.now() - selectionAt < 2500 ? selection : null;
+  const selectionKey = JSON.stringify(currentSelection);
   const amounts = readUniswapAmounts(document);
   const amountKey = JSON.stringify(
     amounts ? { ...amounts, observedAt: 0 } : null,
   );
-  if (location.href === previous && amountKey === previousAmounts) return;
+  if (
+    location.href === previous &&
+    amountKey === previousAmounts &&
+    selectionKey === previousSelection &&
+    Date.now() - lastSent < 5000
+  )
+    return;
+  if (selectionKey !== previousSelection) host.hidden = true;
+  previousSelection = selectionKey;
+  lastSent = Date.now();
+  if (amountKey !== previousAmounts) heldAmounts = amounts;
   previousAmounts = amountKey;
   const navigated = location.href !== previous;
   previous = location.href;
   if (navigated) host.hidden = true;
-  const context = uniswapContext(location.href);
+  let context = uniswapContext(location.href);
   if (context) {
-    context.pageAmounts = amounts;
+    if (currentSelection) context = withSelection(context, currentSelection);
+    context.pageAmounts = heldAmounts;
     void chrome.runtime
       .sendMessage({ type: "CONTEXT", context })
       .catch(() => {});

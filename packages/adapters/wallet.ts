@@ -110,7 +110,7 @@ export function inspectWalletRequest(
     } else if (method.data === "wallet_sendCalls") {
       result.chainId = chain(record(params[0])?.chainId);
     }
-    return walletObservationSchema.parse(result);
+    return walletObservationSchema.parse(result, { jitless: true });
   } catch {
     return null;
   }

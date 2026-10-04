@@ -1,5 +1,6 @@
 import { chromium } from "playwright";
-import { mkdtemp } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile } from "node:fs/promises";
+import assert from "node:assert/strict";
 import os from "node:os";
 import path from "node:path";
 const extension = path.resolve("dist/extension");
@@ -27,15 +28,37 @@ try {
   await page.goto(
     `chrome-extension://${new URL(worker.url()).hostname}/index.html`,
   );
-  const response = await page.evaluate(() =>
-    chrome.runtime.sendMessage({
-      type: "CHECK",
-      address: "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
-      chainId: 4663,
-    }),
+  const catalog = JSON.parse(
+    await readFile("packages/robinhood/feeds.json", "utf8"),
   );
-  console.log(JSON.stringify(response, null, 2));
-  if (response?.snapshot?.canonical !== true) process.exitCode = 1;
+  await mkdir("output/playwright", { recursive: true });
+  await page.setViewportSize({ width: 400, height: 900 });
+  for (const symbol of ["AAPL", "NVDA"]) {
+    const token = catalog.feeds.find((f) => f.symbol === symbol);
+    if (symbol !== "AAPL")
+      await page.getByText("Check another token", { exact: true }).click();
+    await page.getByLabel("Check a contract").fill(token.tokenAddress);
+    await page.getByRole("button", { name: "Check", exact: true }).click();
+    await page
+      .locator(".asset-heading strong")
+      .filter({ hasText: symbol })
+      .waitFor({ timeout: 30000 });
+    assert.ok(await page.getByText("Canonical asset", { exact: true }).count());
+    assert.ok(
+      await page.getByText("Multiplier reconciled", { exact: true }).count(),
+    );
+    await page.locator(".evidence > summary").click();
+    assert.ok(await page.getByText(token.feedAddress, { exact: true }).count());
+    await page.locator(".evidence > summary").click();
+    await page.screenshot({
+      path: `output/playwright/manual-live-${symbol.toLowerCase()}.png`,
+      fullPage: true,
+    });
+    console.log(
+      `PASS live ${symbol}: real manual UI check, registry identity, multiplier reconciliation, configured equity feed.`,
+      await page.locator(".checks").innerText(),
+    );
+  }
 } finally {
   await context.close();
 }

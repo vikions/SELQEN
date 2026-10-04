@@ -10,7 +10,7 @@ import {
   type Snapshot,
   type Intent,
 } from "../../packages/engine/types";
-import type { PageContext } from "../../packages/adapters";
+import { reviewTarget, type PageContext } from "../../packages/adapters";
 import {
   walletObservationSchema,
   type WalletObservation,
@@ -92,7 +92,14 @@ function App() {
         setIntent(undefined);
       }
       setContext(next);
-      const key = `${id}:${next?.url ?? ""}`;
+      const target = reviewTarget(next);
+      const key = JSON.stringify([
+        id,
+        next?.url,
+        target,
+        next?.outputAddress,
+        next?.coverage,
+      ]);
       if (key === contextKey.current) return;
       contextKey.current = key;
       sequence.current++;
@@ -103,8 +110,7 @@ function App() {
       setIntent(undefined);
       setError("");
       lastAddress.current = "";
-      if (next?.tokenAddress && next.chainId === 4663)
-        void run(next.tokenAddress, next.chainId);
+      if (target) void run(target.address, target.chainId);
     }
     void sync();
     const interval = setInterval(() => void sync(), 1000);
@@ -116,6 +122,11 @@ function App() {
   const blocked =
     !!snapshot &&
     evaluate(snapshot, intent, policyAt(now)).verdict === "blocked";
+  const selected = reviewTarget(context);
+  const manualReview =
+    !!snapshot &&
+    (snapshot.address.toLowerCase() !== selected?.address.toLowerCase() ||
+      snapshot.chainId !== selected?.chainId);
   useEffect(() => {
     if (tabId !== undefined)
       void chrome.runtime.sendMessage({
@@ -161,18 +172,30 @@ function App() {
       )}
       <div className="context-bar">
         <strong>
-          {context
-            ? context.chainId === 4663 && context.tokenAddress
-              ? "Uniswap · Robinhood Chain"
-              : "Choose a Robinhood stock token"
-            : "Generic token checker"}
+          {manualReview
+            ? "Manual contract review"
+            : context
+              ? reviewTarget(context)
+                ? "Uniswap · Token detected"
+                : "Choose a Robinhood stock token"
+              : "Generic token checker"}
         </strong>
         <p>
-          {context
-            ? context.chainId === 4663 && context.tokenAddress
-              ? "Reviewing the token from this page’s URL."
-              : "This URL does not identify a supported stock token. Paste its Robinhood Chain contract address below."
-            : "Review any stock-token address against the official Robinhood registry."}
+          {manualReview
+            ? context
+              ? "This result is for the address you entered, not the selected Uniswap token."
+              : "Official-source checks for the contract address you entered."
+            : context
+              ? reviewTarget(context)
+                ? context.coverage === "page-state"
+                  ? busy
+                    ? "Checking the selected token against official sources…"
+                    : "Selected token reviewed. Wallet transaction not verified."
+                  : busy
+                    ? "Checking the token address in this page’s URL…"
+                    : "Review uses the address in this page’s URL."
+                : "Select a stock token in Uniswap. If detection is unavailable, paste its contract address below."
+              : "Review any stock-token address against the official Robinhood registry."}
         </p>
       </div>
       {error && (

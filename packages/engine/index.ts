@@ -183,8 +183,16 @@ export function evaluate(
       add(
         "ORACLE_STALE",
         "blocked",
-        "Oracle reference is unavailable",
-        "The oracle answer is invalid or outside its freshness window.",
+        positive(s.oracle.value) &&
+          Number.isFinite(s.oracle.updatedAt) &&
+          s.oracle.updatedAt <= p.now
+          ? "Oracle price is out of date"
+          : "Invalid oracle reference",
+        positive(s.oracle.value) &&
+          Number.isFinite(s.oracle.updatedAt) &&
+          s.oracle.updatedAt <= p.now
+          ? `Last oracle update: ${new Date(s.oracle.updatedAt).toISOString()}. This price is too old for the configured review window.`
+          : "The oracle answer or its timestamp is invalid.",
       );
     else if (multiplier && bid && ask) {
       const v = new Decimal(s.oracle.value),

@@ -43,3 +43,4 @@ function legacy() {
 window.addEventListener("ethereum#initialized", legacy);
 legacy();
 window.dispatchEvent(new Event("eip6963:requestProvider"));
+import "./selection-observer";

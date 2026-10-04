@@ -38,6 +38,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
   if (
     message?.type === "CONTEXT" &&
     sender.id === chrome.runtime.id &&
+    sender.frameId === 0 &&
     sender.tab?.id !== undefined &&
     sender.url?.startsWith("https://app.uniswap.org/")
   ) {
