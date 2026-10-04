@@ -368,6 +368,26 @@ try {
   console.log(
     "PASS: unpacked MV3 service worker, side-panel page, persistent mode, message validation, 380px layout.",
   );
+  const reloadErrors = [];
+  dapp.on("pageerror", (error) => reloadErrors.push(error.message));
+  await worker.evaluate(() => {
+    setTimeout(() => chrome.runtime.reload(), 50);
+  });
+  await dapp
+    .locator("#selqen-advisory")
+    .waitFor({ state: "detached", timeout: 15000 });
+  await dapp.evaluate(() => {
+    dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true }));
+    window.postMessage(
+      { channel: "selqen-selection-v1", selection: null },
+      location.origin,
+    );
+  });
+  assert.deepEqual(reloadErrors, []);
+  assert.equal(await dapp.locator("#selqen-advisory").count(), 0);
+  console.log(
+    "PASS: real extension reload retires old content script without uncaught errors or restarting stale observers.",
+  );
 } finally {
   await context.close();
 }
