@@ -177,22 +177,23 @@ export function evaluate(
         "No verified Chainlink feed result is available. Canonical identity and REST data do not complete price verification.",
       );
     else if (
-      !fresh(s.oracle.updatedAt, s.oracle.maxAgeMs) ||
-      !positive(s.oracle.value)
+      !positive(s.oracle.value) ||
+      !Number.isFinite(s.oracle.updatedAt) ||
+      s.oracle.updatedAt <= 0 ||
+      s.oracle.updatedAt > p.now + 5_000
     )
       add(
-        "ORACLE_STALE",
+        "ORACLE_INVALID",
         "blocked",
-        positive(s.oracle.value) &&
-          Number.isFinite(s.oracle.updatedAt) &&
-          s.oracle.updatedAt <= p.now
-          ? "Oracle price is out of date"
-          : "Invalid oracle reference",
-        positive(s.oracle.value) &&
-          Number.isFinite(s.oracle.updatedAt) &&
-          s.oracle.updatedAt <= p.now
-          ? `Last oracle update: ${new Date(s.oracle.updatedAt).toISOString()}. This price is too old for the configured review window.`
-          : "The oracle answer or its timestamp is invalid.",
+        "Invalid oracle reference",
+        "The oracle answer or its timestamp is invalid.",
+      );
+    else if (!fresh(s.oracle.updatedAt, s.oracle.maxAgeMs))
+      add(
+        "ORACLE_STALE",
+        intent ? "blocked" : "warning",
+        "Current oracle price unavailable",
+        `Last oracle update: ${new Date(s.oracle.updatedAt).toISOString()}. Equity feeds may retain their last price outside trading sessions. This price is not being treated as current or used to validate a trade.`,
       );
     else if (multiplier && bid && ask) {
       const v = new Decimal(s.oracle.value),
@@ -328,7 +329,9 @@ export function evaluate(
       verdict === "blocked"
         ? "Do not sign yet"
         : verdict === "warning"
-          ? "Review required"
+          ? !intent && findings.some((f) => f.code === "ORACLE_STALE")
+            ? "Price check incomplete"
+            : "Review required"
           : "Asset checks passed",
     scope: intent
       ? "Quote review · signature not inspected"

@@ -45,6 +45,47 @@ const intent = (): Intent => ({
   amountUnit: "raw-token",
 });
 describe("fail-closed safety evaluation", () => {
+  it("keeps expired equity data amber for asset review, but blocks quote valuation", () => {
+    const s = valid();
+    s.oracle!.updatedAt = now - 3 * 86400000;
+    const asset = evaluate(s, undefined, policyAt(now));
+    expect(asset.verdict).toBe("warning");
+    expect(asset.title).toBe("Price check incomplete");
+    expect(asset.findings).toContainEqual(
+      expect.objectContaining({ code: "CANONICAL", level: "pass" }),
+    );
+    expect(asset.findings).toContainEqual(
+      expect.objectContaining({ code: "ORACLE_STALE", level: "warning" }),
+    );
+    expect(
+      asset.findings.some((f) => f.code === "ORACLE" && f.level === "pass"),
+    ).toBe(false);
+    const quote = evaluate(s, intent(), policyAt(now));
+    expect(quote.verdict).toBe("blocked");
+    expect(quote.expectedUsdg).toBeUndefined();
+    expect(quote.deviationPercent).toBeUndefined();
+    s.oraclePaused = true;
+    expect(evaluate(s, undefined, policyAt(now)).verdict).toBe("blocked");
+    s.oraclePaused = false;
+    s.canonical = false;
+    expect(evaluate(s, undefined, policyAt(now)).verdict).toBe("blocked");
+  });
+  it("keeps invalid equity answers and timestamps red even without a quote", () => {
+    for (const change of [
+      { value: "0" },
+      { updatedAt: NaN },
+      { updatedAt: 0 },
+      { updatedAt: now + 60000 },
+    ]) {
+      const s = valid();
+      Object.assign(s.oracle!, change);
+      const r = evaluate(s, undefined, policyAt(now));
+      expect(r.verdict).toBe("blocked");
+      expect(r.findings).toContainEqual(
+        expect.objectContaining({ code: "ORACLE_INVALID", level: "blocked" }),
+      );
+    }
+  });
   it("converts settlement using USDG/USD and rejects a stale reference", () => {
     const s = valid();
     s.settlementOracle = {
