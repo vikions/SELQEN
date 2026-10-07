@@ -10,6 +10,7 @@ import {
 } from "@radix-ui/react-icons";
 import { Brand, Review, AddressForm, short } from "../../packages/ui/Review";
 import { fixture, scenarios, type Scenario } from "../../packages/sdk/fixtures";
+import { receipt, downloadReceipt } from "../../packages/sdk";
 import { evaluate } from "../../packages/engine";
 import {
   policyAt,
@@ -340,6 +341,20 @@ export default function Lab() {
               </span>
             </div>
             <Review
+              onAnchor={
+                snapshot
+                  ? () => {
+                      downloadReceipt(
+                        JSON.stringify(
+                          receipt(snapshot, intent, Date.now()),
+                          null,
+                          2,
+                        ),
+                      );
+                      location.hash = "#receipt";
+                    }
+                  : undefined
+              }
               snapshot={snapshot}
               intent={intent}
               now={now}

@@ -33,6 +33,9 @@ export default function Landing() {
           <Brand />
         </a>
         <nav aria-label="Main navigation">
+          <a href="#receipt">
+            Receipts <ArrowTopRightIcon />
+          </a>
           <a href="#lab">
             Try the demo <ArrowTopRightIcon />
           </a>

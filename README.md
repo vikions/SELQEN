@@ -49,6 +49,7 @@ SELQEN can passively summarize supported MetaMask request shapes, including comm
 
 ### Evidence receipts
 Reviews can be exported as compact JSON receipts containing the asset, network, sources, timestamps, checks and verdict context.
+Live receipts can optionally be registered on Robinhood Chain through the [receipt page](https://selqen.vercel.app/#receipt). The extension downloads the report; the website hashes its exact bytes locally and asks MetaMask to submit only that hash. Registration costs gas and does not validate the report or make a trade safe.
 
 ---
 
@@ -59,7 +60,7 @@ SELQEN has two user modes:
 - **Observe** — shows the review and evidence beside the dApp.
 - **Guard** — adds a stronger advisory warning when a supported check finds a blocking or high-risk condition.
 
-SELQEN does **not** hold funds, request seed phrases, store private keys or sign transactions.
+SELQEN does **not** hold funds, request seed phrases or store private keys. The extension observes wallet requests; optional receipt registration on the website requires a separate transaction confirmed by the user in MetaMask.
 
 The user always remains in control.
 
@@ -132,6 +133,7 @@ SELQEN is structured as a small TypeScript monorepo:
 | `packages/robinhood` | Robinhood source validation and onchain reads |
 | `packages/adapters` | dApp and wallet-context adapters |
 | `packages/sdk` | Review orchestration and evidence receipts |
+| `packages/receipts` | Exact-file hashing and pinned Robinhood Chain receipt registration |
 | `packages/ui` | Shared interface components |
 | `tests` | Unit and integration coverage |
 
@@ -205,7 +207,8 @@ The current focus is expanding supported transaction context and dApp coverage w
 
 `contracts/src/SelqenReceiptRegistry.sol` anchors a receipt's `bytes32` hash and records its first block timestamp and submitting address.
 It proves that a hash was submitted; it does not validate receipt contents, authorship of the underlying receipt, or trade safety. Anyone can submit a hash first.
-No admin, upgradeability, custody, or extension integration. **Deployed on Robinhood Chain mainnet (4663): [0x51bfB2A08E7680786eD54a00eE4d915Bab6B3867](https://robinhoodchain.blockscout.com/address/0x51bfB2A08E7680786eD54a00eE4d915Bab6B3867).**
+No admin, upgradeability or custody. **Deployed on Robinhood Chain mainnet (4663): [0x51bfB2A08E7680786eD54a00eE4d915Bab6B3867](https://robinhoodchain.blockscout.com/address/0x51bfB2A08E7680786eD54a00eE4d915Bab6B3867).**
+Use **Anchor receipt** on a live review, import the downloaded JSON at [SELQEN Receipts](https://selqen.vercel.app/#receipt), connect MetaMask and confirm **Anchor hash**. No wallet is needed to check an existing record. Keep the original file: any byte change produces a different Keccak-256 hash. Fixtures are not accepted. No secrets or new environment variables are needed for this UI.
 Requires Foundry; on Windows without it, from the repository root run `npm install --prefix output/foundry --no-save --package-lock=false --ignore-scripts @foundry-rs/forge-win32-amd64@1.7.1`.
 Set `RH_RPC_URL=https://rpc.mainnet.chain.robinhood.com` and `PRIVATE_KEY` locally (see `contracts/.env.example`); the deployer needs ETH on chain 4663.
 Test from the repo root: `forge test --root contracts` (or use the local `output/foundry/node_modules/@foundry-rs/forge-win32-amd64/bin/forge.exe`).

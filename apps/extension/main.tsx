@@ -4,6 +4,7 @@ import { Brand, Review, AddressForm } from "../../packages/ui/Review";
 import "../../packages/ui/styles.css";
 import "./theme.css";
 import { evaluate } from "../../packages/engine";
+import { receipt, downloadReceipt } from "../../packages/sdk";
 import {
   policyAt,
   USDG,
@@ -219,6 +220,26 @@ function App() {
         </section>
       ) : (
         <Review
+          onAnchor={
+            snapshot
+              ? () => {
+                  downloadReceipt(
+                    JSON.stringify(
+                      receipt(snapshot, intent, Date.now()),
+                      null,
+                      2,
+                    ),
+                  );
+                  void chrome.tabs
+                    .create({ url: "https://selqen.vercel.app/#receipt" })
+                    .catch(() =>
+                      setError(
+                        "Could not open SELQEN. Open https://selqen.vercel.app/#receipt and import the downloaded receipt.",
+                      ),
+                    );
+                }
+              : undefined
+          }
           compactWarnings
           snapshot={snapshot}
           intent={intent}

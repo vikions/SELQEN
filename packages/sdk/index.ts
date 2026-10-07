@@ -20,13 +20,21 @@ export function exportReceipt(
   intent?: Intent,
   now = Date.now(),
 ) {
-  const data = JSON.stringify(receipt(snapshot, intent, now), null, 2);
+  downloadReceipt(
+    JSON.stringify(receipt(snapshot, intent, now), null, 2),
+    `selqen-${snapshot.mode}-${now}.json`,
+  );
+}
+export function downloadReceipt(
+  data: string,
+  filename = "selqen-receipt.json",
+) {
   const url = URL.createObjectURL(
     new Blob([data], { type: "application/json" }),
   );
   const a = document.createElement("a");
   a.href = url;
-  a.download = `selqen-${snapshot.mode}-${now}.json`;
+  a.download = filename;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

@@ -55,6 +55,7 @@ export function Review({
   busy = false,
   onRefresh,
   compactWarnings = false,
+  onAnchor,
 }: {
   snapshot: Snapshot | null;
   intent?: Intent;
@@ -62,6 +63,7 @@ export function Review({
   busy?: boolean;
   onRefresh?: () => void;
   compactWarnings?: boolean;
+  onAnchor?: () => void;
 }) {
   const [copy, setCopy] = useState("Copy JSON");
   if (busy)
@@ -310,6 +312,17 @@ export function Review({
           {copy}
         </button>
       </div>
+      {snapshot.mode === "live" && onAnchor && (
+        <div className="receipt-anchor-action">
+          <button className="secondary" onClick={onAnchor}>
+            Anchor receipt ↗
+          </button>
+          <p className="fine">
+            Downloads this report and opens SELQEN. Import the file there to
+            register its hash with MetaMask.
+          </p>
+        </div>
+      )}
       <div className="review-foot">
         <span>
           {outdated

@@ -378,6 +378,12 @@ a svg {
   gap: 10px;
   margin-top: 24px;
 }
+.receipt-anchor-action {
+  margin-top: 16px;
+}
+.receipt-anchor-action p {
+  margin-bottom: 0;
+}
 .secondary {
   background: #f0f3f1;
   color: var(--ink);
