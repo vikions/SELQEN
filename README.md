@@ -201,6 +201,18 @@ The current focus is expanding supported transaction context and dApp coverage w
 
 ---
 
+## Receipt registry contract
+
+`contracts/src/SelqenReceiptRegistry.sol` anchors a receipt's `bytes32` hash and records its first block timestamp and submitting address.
+It proves that a hash was submitted; it does not validate receipt contents, authorship of the underlying receipt, or trade safety. Anyone can submit a hash first.
+No admin, upgradeability, custody, or extension integration. **Deployed on Robinhood Chain mainnet (4663): [0x51bfB2A08E7680786eD54a00eE4d915Bab6B3867](https://robinhoodchain.blockscout.com/address/0x51bfB2A08E7680786eD54a00eE4d915Bab6B3867).**
+Requires Foundry; on Windows without it, from the repository root run `npm install --prefix output/foundry --no-save --package-lock=false --ignore-scripts @foundry-rs/forge-win32-amd64@1.7.1`.
+Set `RH_RPC_URL=https://rpc.mainnet.chain.robinhood.com` and `PRIVATE_KEY` locally (see `contracts/.env.example`); the deployer needs ETH on chain 4663.
+Test from the repo root: `forge test --root contracts` (or use the local `output/foundry/node_modules/@foundry-rs/forge-win32-amd64/bin/forge.exe`).
+Deploy from the repo root: `forge script --root contracts script/Deploy.s.sol:Deploy --rpc-url robinhood --broadcast`; `run()` returns the registry address and refuses any chain except 4663.
+Deployment [transaction](https://robinhoodchain.blockscout.com/tx/0x94b6de0bbbdc5bec69afadbff2aed6f8895018e9a601350518452b81742b440f) succeeded at block **82306146**; deployed runtime bytecode matches the local compiled contract.
+Network reference: [official Robinhood deployment guide](https://docs.robinhood.com/chain/deploy-smart-contracts/). Source-code verification on the explorer is a separate step.
+
 ## Disclaimer
 
 SELQEN is an independent project and is not affiliated with Robinhood, Uniswap, MetaMask, Chainlink or Paxos.
