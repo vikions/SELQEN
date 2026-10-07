@@ -9,6 +9,8 @@ It runs as a Chrome extension beside the dApps users already use and turns fragm
 **Live app:** https://selqen.vercel.app  
 **Source:** https://github.com/vikions/SELQEN
 
+**Robinhood Chain mainnet contract:** [SelqenReceiptRegistry · 0x51bfB2A08E7680786eD54a00eE4d915Bab6B3867](https://robinhoodchain.blockscout.com/address/0x51bfB2A08E7680786eD54a00eE4d915Bab6B3867)
+
 ---
 
 ## Why SELQEN
